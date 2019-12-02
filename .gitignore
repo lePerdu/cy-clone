@@ -1,0 +1,13 @@
+# .gitignore
+
+bin/
+
+# clang tools
+.clangd/
+compile_commands.json
+
+# Backups
+*~
+
+# MAC stuff
+.DS_Store
