@@ -74,6 +74,17 @@ uint8_t lcd_clear(void) {
     return res;
 }
 
+uint8_t lcd_cursor_home(void) {
+    const uint8_t res = lcd_command(LCD_RETURNHOME);
+    _delay_us(2000);
+    return res;
+}
+
+uint8_t lcd_set_cursor(uint8_t col, uint8_t row) {
+    const uint8_t column_mask = ((row == 0) ? 0x80 : 0xC0);
+    return lcd_command(col | column_mask);
+}
+
 uint8_t lcd_puts(char *s) {
     while (*s) {
         if (lcd_putc(*s++) != 0) {
@@ -102,4 +113,8 @@ uint8_t lcd_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
     }
 
     return 0;
+}
+
+uint8_t lcd_set_color(rgb_color color) {
+    return lcd_set_rgb(color.r, color.g, color.b);
 }
