@@ -1,4 +1,4 @@
-PROJECT_NAME:=cyclone
+PROJECT_NAME:=lucy
 
 SRC:=src
 BIN:=bin
@@ -13,6 +13,9 @@ OBJCOPY:=avr-objcopy
 
 AVRDUDE:=avrdude
 AVRDUDE_CONF:=/etc/avrdude.conf
+
+PORT?=/dev/ttyUSB0
+BAUD:=115200
 
 LOCAL_ASFLAGS:=-Iinclude -mmcu=$(MCU)
 LOCAL_CFLAGS:=-mmcu=$(MCU) -g
@@ -49,8 +52,7 @@ $(BIN):
 .SECONDARY: $(ELFFILE) $(OBJECTS)
 
 upload: $(HEXFILE)
-	$(AVRDUDE) -C $(AVRDUDE_CONF) -P /dev/ttyUSB0 -p $(MCU) -c arduino -b 115200 \
-		-U flash:w:$<:i
+	$(AVRDUDE) -P $(PORT) -p $(MCU) -c arduino -b $(BAUD) -U flash:w:$<:i
 
 clean:
 	rm -rf $(BIN)
