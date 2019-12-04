@@ -11,6 +11,9 @@
 #define STOP_BTN (PIND & _BV(PD2))
 #define RESET_BTN (PIND & _BV(PD3))
 
+#define BUZZER_PORT PORTD
+#define BUZZER_PIN PD7
+
 #define STOP_FLASH_COUNT 2
 
 enum lcd_color {
@@ -62,6 +65,14 @@ static inline void flash_delay(void) {
     _delay_ms(400);
 }
 
+static inline void buzzer_on(void) {
+    BUZZER_PORT |= _BV(BUZZER_PIN);
+}
+
+static inline void buzzer_off(void) {
+    BUZZER_PORT &= ~_BV(BUZZER_PIN);
+}
+
 static inline const light_config *current_light(void) {
     return &LIGHT_CONFIGS[light_index];
 }
@@ -111,10 +122,12 @@ ISR(INT0_vect) {
     lcd_set_color(LCD_COLORS[current_light()->color_index]);
     set_light();
 
+    // clear_light() and set_light() turn off the buzzer
+    buzzer_on();
+
     // Flash the light a few times
     for (uint8_t i = 0; i < STOP_FLASH_COUNT; ++i) {
         flash_delay();
-
         lcd_set_color(LCD_COLORS[WHITE]);
         clear_light();
 
@@ -122,9 +135,11 @@ ISR(INT0_vect) {
 
         lcd_set_color(LCD_COLORS[current_light()->color_index]);
         set_light();
+        buzzer_on();
     }
 
     flash_delay();
+    buzzer_off();
     lcd_clear();
     print_points();
 
@@ -144,7 +159,7 @@ ISR(INT0_vect) {
 
 static void init(void) {
     // Output pins
-    DDRD = 0b01110011; // Skip PD2 and PD3 for buttons
+    DDRD = 0b11110011; // Skip PD2 and PD3 for buttons
     DDRB = 0b00001111;
 
     i2c_init();
