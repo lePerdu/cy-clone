@@ -16,6 +16,8 @@
 
 #define STOP_FLASH_COUNT 2
 
+#define MIDDLE_INDEX 4
+
 enum lcd_color {
     WHITE,
     DARK_RED,
@@ -25,7 +27,13 @@ enum lcd_color {
     BLUE,
 };
 
+enum direction {
+    LEFT,
+    RIGHT,
+};
+
 static uint8_t light_index = 0;
+static enum direction light_direction = RIGHT;
 
 struct light_config {
     uint8_t portb;
@@ -40,7 +48,8 @@ static const struct light_config LIGHT_CONFIGS[] = {
         // Skip PD2 and PD3
         {0x00, 0x10, 50, DARK_RED},
         {0x00, 0x20, 100, LIGHT_RED},
-        {0x00, 0x40, 200, LIGHT_GREEN},
+        // Not possible, but just in case, give it 0 points
+        {0x00, 0x40, 0, LIGHT_GREEN},
         // Skip PD7 (to balance lights across PORTB and PORTD)
         {0x01, 0x00, 100, LIGHT_RED},
         {0x02, 0x00, 50, DARK_RED},
@@ -88,11 +97,13 @@ static void set_light(void) {
 }
 
 static void light_loop(void) {
+    light_direction = RIGHT;
     for (light_index = 0; light_index <= 8; ++light_index) {
         set_light();
         light_delay();
     }
 
+    light_direction = LEFT;
     for (light_index = 7; light_index >= 1; --light_index) {
         set_light();
         light_delay();
@@ -118,6 +129,18 @@ static void print_points(void) {
 }
 
 ISR(INT0_vect) {
+    // Don't let it land on the middle
+    if (light_index == MIDDLE_INDEX) {
+        switch (light_direction) {
+        case RIGHT:
+            ++light_index;
+            break;
+        case LEFT:
+            --light_index;
+            break;
+        }
+    }
+
     // Set the screen and the light (in case set_light()) was interrupted
     lcd_set_color(LCD_COLORS[current_light()->color_index]);
     set_light();
