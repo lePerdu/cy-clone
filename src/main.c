@@ -9,7 +9,6 @@
 #include <util/delay.h>
 
 #define STOP_BTN (PIND & _BV(PD2))
-#define RESET_BTN (PIND & _BV(PD3))
 
 #define BUZZER_PORT PORTD
 #define BUZZER_PIN PD7
@@ -168,15 +167,15 @@ ISR(INT0_vect) {
 
     // Stay in the ISR, essentially pausing the game
 
-    // Reset when PD3 is pressed
-    while (!RESET_BTN) {
+    // Reset when the button is pressed again
+    while (!STOP_BTN) {
     }
 
     lcd_set_color(LCD_COLORS[WHITE]);
     show_instructions();
 
-    // Clear the pending interrupt in case the sensor was tapped during this
-    // handler
+    // Clear the pending interrupt since the button was pressed during the
+    // interrupt
     EIFR |= _BV(INTF0);
 }
 
