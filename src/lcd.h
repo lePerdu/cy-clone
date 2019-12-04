@@ -56,11 +56,11 @@
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-typedef struct rgb_color {
+struct rgb_color {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} rgb_color;
+};
 
 /**
  * Send a command to the LCD.
@@ -150,6 +150,6 @@ uint8_t lcd_set_rgb(uint8_t r, uint8_t g, uint8_t b);
  * \param color RGB intensities.
  * \return 0 on success, 1 on error.
  */
-uint8_t lcd_set_color(rgb_color color);
+uint8_t lcd_set_color(struct rgb_color color);
 
 #endif // LCD_H_

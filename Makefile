@@ -22,7 +22,7 @@ LOCAL_CFLAGS:=-mmcu=$(MCU) -g
 LOCAL_LDFLAGS:=-mmcu=$(MCU) -g
 
 # Make it small by default
-CFLAGS?=-Os
+CFLAGS?=-Os -fshort-enums
 
 # Gather all by default
 SOURCES?=$(wildcard $(SRC)/*.c $(SRC)/*.asm)

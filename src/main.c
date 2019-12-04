@@ -27,14 +27,14 @@ enum lcd_color {
 
 static uint8_t light_index = 0;
 
-typedef struct light_config {
+struct light_config {
     uint8_t portb;
     uint8_t portd;
     uint8_t score;
-    uint8_t color_index;
-} light_config;
+    enum lcd_color color_index;
+};
 
-static const light_config LIGHT_CONFIGS[] = {
+static const struct light_config LIGHT_CONFIGS[] = {
         {0x00, 0x01, 10, DARK_GREEN},
         {0x00, 0x02, 25, BLUE},
         // Skip PD2 and PD3
@@ -48,7 +48,7 @@ static const light_config LIGHT_CONFIGS[] = {
         {0x08, 0x00, 10, DARK_GREEN},
 };
 
-static const rgb_color LCD_COLORS[] = {
+static const struct rgb_color LCD_COLORS[] = {
         [WHITE] = {127, 127, 127},
         [DARK_RED] = {127, 0, 0},
         [LIGHT_RED] = {255, 0, 0},
@@ -58,11 +58,11 @@ static const rgb_color LCD_COLORS[] = {
 };
 
 static inline void light_delay(void) {
-    _delay_ms(50);
+    _delay_ms(40);
 }
 
 static inline void flash_delay(void) {
-    _delay_ms(400);
+    _delay_ms(250);
 }
 
 static inline void buzzer_on(void) {
@@ -73,7 +73,7 @@ static inline void buzzer_off(void) {
     BUZZER_PORT &= ~_BV(BUZZER_PIN);
 }
 
-static inline const light_config *current_light(void) {
+static inline const struct light_config *current_light(void) {
     return &LIGHT_CONFIGS[light_index];
 }
 

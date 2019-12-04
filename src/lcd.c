@@ -115,6 +115,6 @@ uint8_t lcd_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
     return 0;
 }
 
-uint8_t lcd_set_color(rgb_color color) {
+uint8_t lcd_set_color(struct rgb_color color) {
     return lcd_set_rgb(color.r, color.g, color.b);
 }
