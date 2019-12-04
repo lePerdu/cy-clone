@@ -6,6 +6,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <util/delay.h>
 
 #define STOP_BTN (PIND & _BV(PD2))
@@ -16,6 +17,9 @@
 #define STOP_FLASH_COUNT 2
 
 #define MIDDLE_INDEX 4
+
+#define MIDDLE_SKIP_PROB 0.75
+#define MIDDLE_SKIP_CUTOFF ((int)(MIDDLE_SKIP_PROB * INT_MAX))
 
 enum lcd_color {
     WHITE,
@@ -48,7 +52,7 @@ static const struct light_config LIGHT_CONFIGS[] = {
         {0x00, 0x10, 50, DARK_RED},
         {0x00, 0x20, 100, LIGHT_RED},
         // Not possible, but just in case, give it 0 points
-        {0x00, 0x40, 0, LIGHT_GREEN},
+        {0x00, 0x40, 250, LIGHT_GREEN},
         // Skip PD7 (to balance lights across PORTB and PORTD)
         {0x01, 0x00, 100, LIGHT_RED},
         {0x02, 0x00, 50, DARK_RED},
@@ -130,13 +134,15 @@ static void print_points(void) {
 ISR(INT0_vect) {
     // Don't let it land on the middle
     if (light_index == MIDDLE_INDEX) {
-        switch (light_direction) {
-        case RIGHT:
-            ++light_index;
-            break;
-        case LEFT:
-            --light_index;
-            break;
+        if (rand() < MIDDLE_SKIP_CUTOFF) {
+            switch (light_direction) {
+            case RIGHT:
+                ++light_index;
+                break;
+            case LEFT:
+                --light_index;
+                break;
+            }
         }
     }
 
